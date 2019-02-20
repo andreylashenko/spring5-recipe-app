@@ -1,6 +1,8 @@
 package guru.springframework.controllers;
 
 import guru.springframework.commands.IngredientCommand;
+import guru.springframework.commands.RecipeCommand;
+import guru.springframework.commands.UnitOfMeasureCommand;
 import guru.springframework.domain.Ingredient;
 import guru.springframework.services.IngredientService;
 import guru.springframework.services.RecipeService;
@@ -22,6 +24,27 @@ public class IngredientController {
         this.recipeService = recipeService;
         this.ingredientService = ingredientService;
         this.unitOfMeasureService = unitOfMeasureService;
+    }
+
+    @GetMapping
+    @RequestMapping("recipe/{recipeId}/ingredient/new")
+    public String newRecipe(@PathVariable String recipeId, Model model) {
+        IngredientCommand ingredientCommand = new IngredientCommand();
+        ingredientCommand.setRecipeId(Long.valueOf(recipeId));
+        model.addAttribute("ingredient", ingredientCommand);
+
+        ingredientCommand.setUnitOfMeasure(new UnitOfMeasureCommand());
+        model.addAttribute("uomList", unitOfMeasureService.listAllUoms());
+
+        return "recipe/ingredient/ingredientform";
+    }
+
+    @GetMapping
+    @RequestMapping("recipe/{recipeId}/ingredient/{ingredientId}/delete")
+    public String deleteIngredient(@PathVariable String recipeId, @PathVariable String ingredientId, Model model) {
+        ingredientService.deleteRecipeIngredient(Long.valueOf(recipeId), Long.valueOf(ingredientId));
+
+        return "redirect:/recipe/"+ recipeId +"/ingredients";
     }
 
     @GetMapping
